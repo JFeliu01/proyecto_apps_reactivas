@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Layout from "./Layout";
 
 // ------------------------------------------------------------------
 // OPGG-style Champion Grid
@@ -65,9 +66,7 @@ export default function App() {
   }, [champions, q, role, sort]);
 
   return (
-    <div className="min-h-screen bg-neutral-800 text-neutral-100">
-      <Header />
-
+    <Layout>
       <div className="mx-auto w-full max-w-7xl px-4 pb-16">
         {/* Controls */}
         <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-800/60 bg-neutral-950/70 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/40">
@@ -119,16 +118,7 @@ export default function App() {
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-function Header() {
-  return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8">
-      <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">OP.GG style · Champions</h1>
-      <p className="text-neutral-400 mt-1 text-sm">Local data · No external fetch (except the images you host).</p>
-    </div>
+    </Layout>
   );
 }
 
