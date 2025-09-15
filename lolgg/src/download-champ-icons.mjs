@@ -3,6 +3,8 @@ import fsp from "fs/promises";
 import path from "path";
 import os from "os";
 
+
+// Este script lo sirve para descargar los iconos de los campeones xd
 const args = Object.fromEntries(
   process.argv.slice(2).map(a => {
     const [k, v = true] = a.startsWith("--") ? a.slice(2).split("=") : [a, true];
