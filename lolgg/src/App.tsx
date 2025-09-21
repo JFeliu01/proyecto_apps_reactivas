@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Layout from "./Layout";
+import AatroxView from "./AatroxView";
+import HeroPage from "./HeroPage";
 
 // Role icons imports
 import AllIcon from "./assets/120px-All_icon.png";
@@ -27,6 +29,9 @@ import MarksmanTagIcon from "./assets/Marksman_icon.png";
 // Utility: very light role mapping to mimic op.gg filters
 const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
+
+// Views for the application
+type AppView = 'hero' | 'grid' | 'aatrox';
 
 // Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
@@ -63,6 +68,7 @@ export default function App() {
   const [champions, setChampions] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<AppView>('hero');
 
   const [q, setQ] = useState("");
   const [role, setRole] = useState<Role>("All");
@@ -102,64 +108,77 @@ export default function App() {
   }, [champions, q, role, sort]);
 
   return (
-    <Layout>
-      <div className="mx-auto w-full max-w-7xl px-4 pb-16">
-        {/* Controls */}
-        <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/95 dark:bg-neutral-900 backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-neutral-950/40">
-          <div className="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2 overflow-x-auto">
-              {ROLE_TABS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setRole(t)}
-                  className={[
-                    "px-3 py-2 rounded-full text-sm whitespace-nowrap border transition flex items-center gap-2",
-                    role === t
-                      ? "bg-sky-500 text-white border-transparent shadow"
-                      : "bg-neutral-100/70 dark:bg-neutral-900/70 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-900",
-                  ].join(" ")}
-                >
-                  <img 
-                    src={ROLE_ICONS[t]} 
-                    alt={`${t} role icon`} 
-                    className="w-4 h-4 object-contain"
-                  />
-                  {t}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="relative w-64 max-w-[70vw]">
-                <input
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="Search champion…"
-                  className="w-full rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-10 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                />
-                <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16a6.471 6.471 0 004.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14m-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <Layout 
+      onShowAatrox={() => setCurrentView('aatrox')}
+      onShowGrid={() => setCurrentView('grid')}
+      currentView={currentView}
+    >
+      {currentView === 'hero' ? (
+        <HeroPage onEnterApp={() => setCurrentView('grid')} />
+      ) : currentView === 'aatrox' ? (
+        <AatroxView 
+          champions={champions}
+          onShowGrid={() => setCurrentView('grid')}
+        />
+      ) : (
+        <div className="mx-auto w-full max-w-7xl px-4 pb-16">
+          {/* Controls */}
+          <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/95 dark:bg-neutral-900 backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-neutral-950/40">
+            <div className="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 overflow-x-auto">
+                {ROLE_TABS.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setRole(t)}
+                    className={[
+                      "px-3 py-2 rounded-full text-sm whitespace-nowrap border transition flex items-center gap-2",
+                      role === t
+                        ? "bg-sky-500 text-white border-transparent shadow"
+                        : "bg-neutral-100/70 dark:bg-neutral-900/70 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-900",
+                    ].join(" ")}
+                  >
+                    <img 
+                      src={ROLE_ICONS[t]} 
+                      alt={`${t} role icon`} 
+                      className="w-4 h-4 object-contain"
+                    />
+                    {t}
+                  </button>
+                ))}
               </div>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value as any)}
-                className="rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                aria-label="Sort champions by"
-              >
-                <option value="alpha">Alphabetical</option>
-                <option value="difficulty">By Difficulty</option>
-              </select>
+              <div className="flex items-center gap-3">
+                <div className="relative w-64 max-w-[70vw]">
+                  <input
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                    placeholder="Search champion…"
+                    className="w-full rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-10 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                  <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16a6.471 6.471 0 004.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14m-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as any)}
+                  className="rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  aria-label="Sort champions by"
+                >
+                  <option value="alpha">Alphabetical</option>
+                  <option value="difficulty">By Difficulty</option>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Grid */}
-        <div className="mt-6 grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
-          {loading && <SkeletonGrid />}
-          {error && <div className="text-red-400 text-sm">Error: {error}</div>}
-          {!loading && !error && list.map((c: any) => (
-            <ChampionTile key={c.id} champ={c} />
-          ))}
+          {/* Grid */}
+          <div className="mt-6 grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
+            {loading && <SkeletonGrid />}
+            {error && <div className="text-red-400 text-sm">Error: {error}</div>}
+            {!loading && !error && list.map((c: any) => (
+              <ChampionTile key={c.id} champ={c} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 }
