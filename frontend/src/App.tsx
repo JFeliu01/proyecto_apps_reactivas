@@ -75,7 +75,7 @@ export default function App() {
   const [sort, setSort] = useState<"alpha" | "difficulty">("alpha");
 
   useEffect(() => {
-    fetch("/backend/champion.json")
+    fetch("http://localhost:3001/api/champions")
       .then((r) => {
         if (!r.ok) throw new Error("Could not load champion.json");
         return r.json();
@@ -195,7 +195,7 @@ function SkeletonGrid() {
 
 function ChampionTile({ champ }: { champ: any }) {
   const [open, setOpen] = useState(false);
-  const iconUrl = `/backend/champion-icons/${champ.id}.png`;
+  const iconUrl = `http://localhost:3001/images/${champ.id}.png`;
 
   return (
     <>
