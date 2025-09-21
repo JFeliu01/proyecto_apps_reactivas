@@ -75,12 +75,12 @@ export default function App() {
   const [sort, setSort] = useState<"alpha" | "difficulty">("alpha");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/champions")
+    fetch("http://localhost:3001/data")
       .then((r) => {
-        if (!r.ok) throw new Error("Could not load champion.json");
+        if (!r.ok) throw new Error("Could not load champions");
         return r.json();
       })
-      .then((data) => setChampions(data))
+      .then((data) => setChampions({ data })) // json-server returns the object directly, not wrapped in a data key. We wrap it back.
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -195,7 +195,7 @@ function SkeletonGrid() {
 
 function ChampionTile({ champ }: { champ: any }) {
   const [open, setOpen] = useState(false);
-  const iconUrl = `http://localhost:3001/images/${champ.id}.png`;
+  const iconUrl = `http://localhost:3001/${champ.id}.png`;
 
   return (
     <>
