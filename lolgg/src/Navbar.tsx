@@ -20,7 +20,7 @@ const Navbar: React.FC<NavbarProps> = ({ onShowAatrox, onShowGrid, currentView }
       <button 
         onClick={currentView === 'aatrox' ? onShowGrid : onShowAatrox}
         className="p-2 text-neutral-700 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors flex items-center gap-2"
-        aria-label={currentView === 'aatrox' ? "Volver al Grid" : "Ver Aatrox"}
+        aria-label={currentView === 'aatrox' ? "Back to Grid" : "View Aatrox"}
       >
         {currentView === 'aatrox' ? (
           // Icono de grid/lista para volver

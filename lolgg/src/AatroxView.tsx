@@ -21,7 +21,7 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <div className="text-center">
-          <p className="text-neutral-500 dark:text-neutral-400">Cargando información de Aatrox...</p>
+          <p className="text-neutral-500 dark:text-neutral-400">Loading Aatrox information...</p>
         </div>
       </div>
     );
@@ -39,7 +39,7 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        Volver al listado de campeones
+        Back to champion list
       </button>
 
       {/* Header con información básica */}
@@ -93,7 +93,7 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
         {/* Info general */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-lg">
           <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
-            Información General
+            General Information
           </h3>
           <div className="space-y-3">
             {aatrox.info && Object.entries(aatrox.info).map(([key, value]) => (
@@ -136,7 +136,7 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
         {/* Stats base */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-lg">
           <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
-            Estadísticas Base
+            Base Stats
           </h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {aatrox.stats && Object.entries(aatrox.stats).map(([key, value]) => (

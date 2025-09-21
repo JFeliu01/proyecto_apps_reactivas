@@ -21,13 +21,13 @@ const HeroPage: React.FC<HeroPageProps> = ({ onEnterApp }) => {
               />
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-neutral-600 dark:text-neutral-300">
-                Tu compañero definitivo para convertirte en una leyenda
+                Your ultimate companion to become a legend
             </h2>
           </div>
 
           {/* Description */}
           <p className="mx-auto max-w-3xl text-base sm:text-lg md:text-xl leading-relaxed text-neutral-600 dark:text-neutral-400">
-            Explora el roster completo de campeones, conoce sus habilidades y estadísticas, y encuentra el campeón perfecto para tu estilo de juego.
+            Explore the complete champion roster, learn their abilities and stats, and find the perfect champion for your playstyle.
           </p>
 
           {/* Feature cards */}
@@ -45,10 +45,10 @@ const HeroPage: React.FC<HeroPageProps> = ({ onEnterApp }) => {
                 </svg>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                Colección de Campeones
+                Champion Collection
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400">
-                Explora la colección completa y conoce a cada campeón a detalle.
+                Explore the complete collection and get to know each champion in detail.
               </p>
             </div>
 
@@ -65,10 +65,10 @@ const HeroPage: React.FC<HeroPageProps> = ({ onEnterApp }) => {
                 </svg>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                Filtros por Roles
+                Role Filters
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400">
-                Filtra por tu rol preferido.
+                Filter by your preferred role.
               </p>
             </div>
 
@@ -92,10 +92,10 @@ const HeroPage: React.FC<HeroPageProps> = ({ onEnterApp }) => {
                 </svg>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-                Stats Detalladas
+                Detailed Stats
               </h3>
               <p className="text-neutral-600 dark:text-neutral-400">
-                Consulta estadísticas, items y habilidades de cada campeón.
+                Check stats, items, and abilities for each champion.
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ const HeroPage: React.FC<HeroPageProps> = ({ onEnterApp }) => {
               onClick={onEnterApp}
               className="group relative inline-flex items-center justify-center gap-3 rounded-2xl border-2 border-neutral-700 dark:border-neutral-300 bg-neutral-800 dark:bg-white px-8 py-4 text-base sm:text-lg font-semibold text-white dark:text-neutral-900 shadow-xl hover:border-neutral-600 dark:hover:border-neutral-400 hover:bg-neutral-700 dark:hover:bg-neutral-50 hover:shadow-2xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-neutral-500/50 dark:focus:ring-neutral-400/50 focus:ring-offset-2 cursor-pointer"
             >
-              Explorar Campeones
+              Explore Champions
               <svg
                 className="h-5 w-5 transition-transform group-hover:translate-x-1 text-neutral-100 dark:text-neutral-700"
                 viewBox="0 0 24 24"

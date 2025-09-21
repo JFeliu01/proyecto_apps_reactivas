@@ -30,8 +30,8 @@ import MarksmanTagIcon from "./assets/Marksman_icon.png";
 const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
-// Views for the application
-type AppView = 'hero' | 'grid' | 'aatrox';
+// Views for the application (needs to be SPA)
+type AppView = 'hero' | 'grid' | 'aatrox'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
 
 // Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
@@ -77,7 +77,7 @@ export default function App() {
   useEffect(() => {
     fetch("/backend/champion.json")
       .then((r) => {
-        if (!r.ok) throw new Error("No se pudo cargar champion.json");
+        if (!r.ok) throw new Error("Could not load champion.json");
         return r.json();
       })
       .then((data) => setChampions(data))
