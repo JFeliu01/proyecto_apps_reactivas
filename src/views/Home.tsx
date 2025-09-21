@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type {ChampionData} from "../types/types";
+import { TextField, Grid, Card, CardContent, CardMedia, Typography } from "@mui/material";
 
 
 function Home(){
@@ -19,30 +20,66 @@ function Home(){
 
 
 
-    return(
-        <div style={{ padding: "1rem" }}>
-            <h1>Champions</h1>
-            <input type="text" placeholder="search champion" value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginBottom: "1rem", padding: "0.5rem" }}/>
+    return (
+        <div style={{ padding: "2rem" }}>
+        <Typography variant="h3" sx={{ color: "var(--gold)", mb: 2, fontFamily: "Cinzel" }}>
+            Champions
+        </Typography>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem" }}>
-                {filtered.map((champ) => (
-                    <Link key={champ.id} to={`/champion/${champ.id}`}>
-                        <div style={{ textAlign: "center" }}>
-                            <img
-                                src={`https://ddragon.leagueoflegends.com/cdn/15.18.1/img/champion/${champ.image.full}`}
-                                alt={champ.name}
-                                style={{ width: "100px", borderRadius: "8px" }}
-                            />
-                            <h3>{champ.name}</h3>
-                            <p>{champ.title}</p>
+        <TextField
+            label="Search champion"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{
+            mb: 3,
+            input: { color: "white" },
+            label: { color: "var(--gold)" },
+            "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "var(--gold)" },
+                "&:hover fieldset": { borderColor: "white" },
+                "&.Mui-focused fieldset": { borderColor: "var(--gold)" }
+            }
+            }}
+        />
 
-                        </div>
+        <Grid container spacing={3}>
+            {filtered.map((champ) => (
+                <Grid item xs={12} sm={6} md={3} key={champ.id}>
+                    <Link to={`/champion/${champ.id}`}>
+                    <Card
+                        sx={{
+                        backgroundColor: "var(--card-bg)",
+                        border: "1px solid var(--gold)",
+                        borderRadius: "12px",
+                        transition: "transform 0.3s, box-shadow 0.3s",
+                        "&:hover": {
+                            transform: "scale(1.05)",
+                            boxShadow: "0 0 15px rgba(200, 155, 60, 0.6)"
+                        }
+                        }}
+                    >
+                        <CardMedia
+                        component="img"
+                        height="140"
+                        image={`https://ddragon.leagueoflegends.com/cdn/15.18.1/img/champion/${champ.image.full}`}
+                        alt={champ.name}
+                        />
+                        <CardContent>
+                        <Typography variant="h6" sx={{ color: "white" }}>
+                            {champ.name}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "var(--gold)" }}>
+                            {champ.title}
+                        </Typography>
+                        </CardContent>
+                    </Card>
                     </Link>
-                ))}
-
-            </div>
+                </Grid>
+            ))}
+        </Grid>
         </div>
-
     );
 }
 
