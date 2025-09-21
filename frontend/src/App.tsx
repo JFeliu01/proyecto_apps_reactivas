@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
-import Layout from "./Layout";
-import AatroxView from "./AatroxView";
-import HeroPage from "./HeroPage";
+import { useEffect, useMemo, useState } from "react";
+import Layout from "./components/Layout";
+import AatroxView from "./components/AatroxView";
+import HeroPage from "./components/HeroPage";
 
 // Role icons imports
 import AllIcon from "./assets/120px-All_icon.png";
@@ -111,6 +111,7 @@ export default function App() {
     <Layout 
       onShowAatrox={() => setCurrentView('aatrox')}
       onShowGrid={() => setCurrentView('grid')}
+      onShowHero={() => setCurrentView('hero')}
       currentView={currentView}
     >
       {currentView === 'hero' ? (

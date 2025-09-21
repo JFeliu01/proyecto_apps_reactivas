@@ -1,6 +1,6 @@
 import React from 'react';
 // Importar iconos de subroles
-import FighterIcon from './assets/Fighter_icon.png';
+import FighterIcon from '../assets/Fighter_icon.png';
 
 // Mapeo de iconos de tags
 const TAG_ICONS: Record<string, string> = {

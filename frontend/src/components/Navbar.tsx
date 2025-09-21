@@ -1,16 +1,17 @@
 import React from "react";
-import lolggIcon from "./assets/lolggicon.png";
-import ThemeToggle from "./ThemeToggle";
+import lolggIcon from "../assets/lolggicon.png";
+import ThemeToggle from "../ThemeToggle";
 
 type AppView = 'hero' | 'grid' | 'aatrox';
 
 interface NavbarProps {
   onShowAatrox: () => void;
   onShowGrid: () => void;
+  onShowHero: () => void;
   currentView: AppView;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onShowAatrox, onShowGrid, currentView }) => {
+const Navbar: React.FC<NavbarProps> = ({ onShowAatrox, onShowGrid, onShowHero, currentView }) => {
   const renderNavigationButton = () => {
     if (currentView === 'hero') {
       return null; // No mostramos botón de navegación en la hero page
@@ -46,11 +47,13 @@ const Navbar: React.FC<NavbarProps> = ({ onShowAatrox, onShowGrid, currentView }
   return (
     <nav className="w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800 px-4 py-3">
       <div className="flex items-center justify-between w-full">
-        <img 
-          src={lolggIcon} 
-          alt="LoL GG Logo" 
-          className="h-20 w-auto -my-2 invert dark:invert-0 transition-all duration-300" 
-        />
+        <button onClick={onShowHero} aria-label="Go to homepage">
+          <img 
+            src={lolggIcon} 
+            alt="LoL GG Logo" 
+            className="h-20 w-auto -my-2 invert dark:invert-0 transition-all duration-300" 
+          />
+        </button>
         <div className="flex items-center space-x-2">
           {renderNavigationButton()}
           <ThemeToggle />

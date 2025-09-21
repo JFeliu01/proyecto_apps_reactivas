@@ -1,5 +1,5 @@
 import React from "react";
-import lolggIcon from "./assets/lolggicon.png";
+import lolggIcon from "../assets/lolggicon.png";
 
 interface HeroPageProps {
   onEnterApp: () => void;
