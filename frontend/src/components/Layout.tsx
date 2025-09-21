@@ -1,21 +1,19 @@
 import React from "react";
 import Navbar from "./Navbar";
 
-type AppView = 'hero' | 'grid' | 'aatrox';
+type AppView = 'hero' | 'grid' | 'champion';
 
 interface LayoutProps {
   children: React.ReactNode;
-  onShowAatrox: () => void;
   onShowGrid: () => void;
   onShowHero: () => void;
   currentView: AppView;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, onShowAatrox, onShowGrid, onShowHero, currentView }) => {
+const Layout: React.FC<LayoutProps> = ({ children, onShowGrid, onShowHero, currentView }) => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
       <Navbar 
-        onShowAatrox={onShowAatrox}
         onShowGrid={onShowGrid}
         onShowHero={onShowHero}
         currentView={currentView}

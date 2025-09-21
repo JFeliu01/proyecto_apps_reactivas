@@ -1,37 +1,44 @@
 import React from 'react';
-// Importar iconos de subroles
-import FighterIcon from '../assets/Fighter_icon.png';
 
-// Mapeo de iconos de tags
+// Role and sub-role icon imports
+import FighterIcon from '../assets/Fighter_icon.png';
+import TankIcon from "../assets/Tank_icon.png";
+import MageIcon from "../assets/Mage_icon.png";
+import AssassinIcon from "../assets/Assasin_icon.png";
+import SupportTagIcon from "../assets/Support_icon.png";
+import MarksmanTagIcon from "../assets/Marksman_icon.png";
+
+// Mapping of tag names to their icons
 const TAG_ICONS: Record<string, string> = {
   Fighter: FighterIcon,
+  Tank: TankIcon,
+  Mage: MageIcon,
+  Assassin: AssassinIcon,
+  Support: SupportTagIcon,
+  Marksman: MarksmanTagIcon,
 };
 
-interface AatroxViewProps {
-  champions: any;
+interface ChampionViewProps {
+  champion: any;
   onShowGrid: () => void;
 }
 
-const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
-  // Obtener datos de Aatrox
-  const aatrox = champions?.data?.Aatrox;
-  
-  // Esto va a servir a futuro cuando si usemos la API
-  if (!aatrox) {
+const ChampionView: React.FC<ChampionViewProps> = ({ champion, onShowGrid }) => {
+  if (!champion) {
     return (
       <div className="mx-auto w-full max-w-4xl px-4 py-8">
         <div className="text-center">
-          <p className="text-neutral-500 dark:text-neutral-400">Loading Aatrox information...</p>
+          <p className="text-neutral-500 dark:text-neutral-400">Champion information not available.</p>
         </div>
       </div>
     );
   }
 
-  const iconUrl = `/backend/champion-icons/${aatrox.id}.png`;
+  const iconUrl = `http://localhost:3001/${champion.id}.png`;
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
-      {/* Botón para volver al grid */}
+      {/* Back to grid button */}
       <button
         onClick={onShowGrid}
         className="mb-6 flex items-center gap-2 px-4 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-lg transition-colors"
@@ -42,24 +49,24 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
         Back to champion list
       </button>
 
-      {/* Header con información básica */}
+      {/* Basic info header */}
       <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-lg mb-6">
         <div className="p-6">
           <div className="flex items-center gap-6 mb-6">
             <img 
               src={iconUrl} 
-              alt={aatrox.name}
+              alt={champion.name}
               className="w-24 h-24 rounded-xl shadow-md"
             />
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
-                {aatrox.name}
+                {champion.name}
               </h1>
               <p className="text-lg text-neutral-600 dark:text-neutral-300 mb-3">
-                {aatrox.title}
+                {champion.title}
               </p>
               <div className="flex gap-2">
-                {(aatrox.tags || []).map((tag: string) => (
+                {(champion.tags || []).map((tag: string) => (
                   <span 
                     key={tag} 
                     className="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full text-sm text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-700"
@@ -78,25 +85,25 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
             </div>
           </div>
           
-          {/* Descripción */}
+          {/* Description */}
           <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-lg p-4">
             <h3 className="font-semibold text-neutral-900 dark:text-white mb-2">Lore</h3>
             <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">
-              {aatrox.blurb}
+              {champion.blurb}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Stats detalladas */}
+      {/* Detailed stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Info general */}
+        {/* General Info */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-lg">
           <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
             General Information
           </h3>
           <div className="space-y-3">
-            {aatrox.info && Object.entries(aatrox.info).map(([key, value]) => (
+            {champion.info && Object.entries(champion.info).map(([key, value]) => (
               <div key={key} className="flex justify-between items-center">
                 <span className="text-neutral-600 dark:text-neutral-400 capitalize">
                   {key}
@@ -126,20 +133,20 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
                   Resource Type
                 </span>
                 <span className="text-neutral-900 dark:text-white font-medium">
-                  {aatrox.partype || 'N/A'}
+                  {champion.partype || 'N/A'}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats base */}
+        {/* Base Stats */}
         <div className="bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-6 shadow-lg">
           <h3 className="text-xl font-semibold text-neutral-900 dark:text-white mb-4">
             Base Stats
           </h3>
           <div className="space-y-2 max-h-80 overflow-y-auto">
-            {aatrox.stats && Object.entries(aatrox.stats).map(([key, value]) => (
+            {champion.stats && Object.entries(champion.stats).map(([key, value]) => (
               <div key={key} className="flex justify-between items-center py-1">
                 <span className="text-neutral-600 dark:text-neutral-400 text-sm">
                   {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
@@ -156,4 +163,4 @@ const AatroxView: React.FC<AatroxViewProps> = ({ champions, onShowGrid }) => {
   );
 };
 
-export default AatroxView;
+export default ChampionView;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout";
-import AatroxView from "./components/AatroxView";
+import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
 
 // Role icons imports
@@ -31,7 +31,7 @@ const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
 // Views for the application (needs to be SPA)
-type AppView = 'hero' | 'grid' | 'aatrox'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
+type AppView = 'hero' | 'grid' | 'champion'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
 
 // Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
@@ -69,6 +69,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<AppView>('hero');
+  const [selectedChampionId, setSelectedChampionId] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [role, setRole] = useState<Role>("All");
@@ -107,19 +108,38 @@ export default function App() {
     return arr;
   }, [champions, q, role, sort]);
 
+  const handleShowChampionDetails = (championId: string) => {
+    setSelectedChampionId(championId);
+    setCurrentView('champion');
+  };
+
+  const handleShowGrid = () => {
+    setSelectedChampionId(null);
+    setCurrentView('grid');
+  };
+  
+  const handleShowHero = () => {
+    setSelectedChampionId(null);
+    setCurrentView('hero');
+  };
+
+  const selectedChampion = useMemo(() => {
+    if (!selectedChampionId || !champions?.data) return null;
+    return champions.data[selectedChampionId];
+  }, [selectedChampionId, champions]);
+
   return (
     <Layout 
-      onShowAatrox={() => setCurrentView('aatrox')}
-      onShowGrid={() => setCurrentView('grid')}
-      onShowHero={() => setCurrentView('hero')}
+      onShowGrid={handleShowGrid}
+      onShowHero={handleShowHero}
       currentView={currentView}
     >
       {currentView === 'hero' ? (
         <HeroPage onEnterApp={() => setCurrentView('grid')} />
-      ) : currentView === 'aatrox' ? (
-        <AatroxView 
-          champions={champions}
-          onShowGrid={() => setCurrentView('grid')}
+      ) : currentView === 'champion' ? (
+        <ChampionView 
+          champion={selectedChampion}
+          onShowGrid={handleShowGrid}
         />
       ) : (
         <div className="mx-auto w-full max-w-7xl px-4 pb-16">
@@ -175,7 +195,11 @@ export default function App() {
             {loading && <SkeletonGrid />}
             {error && <div className="text-red-400 text-sm">Error: {error}</div>}
             {!loading && !error && list.map((c: any) => (
-              <ChampionTile key={c.id} champ={c} />
+              <ChampionTile 
+                key={c.id} 
+                champ={c} 
+                onShowDetails={() => handleShowChampionDetails(c.id)}
+              />
             ))}
           </div>
         </div>
@@ -194,7 +218,7 @@ function SkeletonGrid() {
   );
 }
 
-function ChampionTile({ champ }: { champ: any }) {
+function ChampionTile({ champ, onShowDetails }: { champ: any, onShowDetails: () => void }) {
   const [open, setOpen] = useState(false);
   const iconUrl = `http://localhost:3001/${champ.id}.png`;
 
@@ -267,6 +291,7 @@ function ChampionTile({ champ }: { champ: any }) {
             </div>
             <div className="flex justify-end gap-2 p-4 border-t border-neutral-200 dark:border-neutral-800">
               <button onClick={() => setOpen(false)} className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100">Close</button>
+              <button onClick={onShowDetails} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
             </div>
           </div>
         </div>
