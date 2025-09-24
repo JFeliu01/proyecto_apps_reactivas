@@ -34,7 +34,7 @@ const ChampionView: React.FC<ChampionViewProps> = ({ champion, onShowGrid }) => 
     );
   }
 
-  const iconUrl = `http://localhost:3001/${champion.id}.png`;
+  const iconUrl = `http://localhost:3001/images/${champion.id}.png`;
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
