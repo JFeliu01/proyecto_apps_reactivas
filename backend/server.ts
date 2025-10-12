@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import './src/database';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
