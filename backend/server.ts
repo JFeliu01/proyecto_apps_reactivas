@@ -3,6 +3,7 @@ import './src/database';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import type { ChampionData } from './src/models/champion';
 
 const app = express();
 const PORT = 3001;
@@ -18,7 +19,8 @@ app.get('/api/champions', (req: Request, res: Response) => {
       res.status(500).send('Error reading champion data');
       return;
     }
-    res.json(JSON.parse(data));
+    const json: ChampionData = JSON.parse(data);
+    res.json(json);
   });
 });
 

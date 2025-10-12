@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Champion } from '../types/champion';
 
 // Role and sub-role icon imports
 import FighterIcon from '../assets/Fighter_icon.png';
@@ -19,7 +20,7 @@ const TAG_ICONS: Record<string, string> = {
 };
 
 interface ChampionViewProps {
-  champion: any;
+  champion: Champion | null;
   onShowGrid: () => void;
 }
 

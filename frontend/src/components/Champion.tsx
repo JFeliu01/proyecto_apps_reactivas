@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import type { Champion } from "../types/champion";
 
 interface ChampionProps {
-  champ: any;
+  champ: Champion;
 }
 
 const Champion: React.FC<ChampionProps> = ({ champ }) => {
@@ -31,7 +32,7 @@ const Champion: React.FC<ChampionProps> = ({ champ }) => {
             <span className="font-semibold">Info:</span>
             <ul>
               {champ.info && Object.entries(champ.info).map(([k, v]) => (
-                <li key={k}>{k}: {v as any}</li>
+                <li key={k}>{k}: {v as number}</li>
               ))}
             </ul>
           </div>
@@ -39,7 +40,7 @@ const Champion: React.FC<ChampionProps> = ({ champ }) => {
             <span className="font-semibold">Stats:</span>
             <ul>
               {champ.stats && Object.entries(champ.stats).map(([k, v]) => (
-                <li key={k}>{k}: {v as any}</li>
+                <li key={k}>{k}: {v as number}</li>
               ))}
             </ul>
           </div>
