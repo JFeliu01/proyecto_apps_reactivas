@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout";
 import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
+import { API_URI } from "./runtimeConfig";
 
 // Role icons imports
 import AllIcon from "./assets/120px-All_icon.png";
@@ -25,6 +26,7 @@ import MarksmanTagIcon from "./assets/Marksman_icon.png";
 // - Uses locally saved square icons:   /backend/champion-icons/<Id>.png
 // - Tailwind-only, no extra deps. Clean, responsive, keyboard friendly.
 // ------------------------------------------------------------------
+
 
 // Utility: very light role mapping to mimic op.gg filters
 const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
@@ -76,7 +78,7 @@ export default function App() {
   const [sort, setSort] = useState<"alpha" | "difficulty">("alpha");
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/champions")
+    fetch(`${API_URI}/api/champions`)
       .then((r) => {
         if (!r.ok) throw new Error("Could not load champions");
         return r.json();
@@ -220,7 +222,7 @@ function SkeletonGrid() {
 
 function ChampionTile({ champ, onShowDetails }: { champ: any, onShowDetails: () => void }) {
   const [open, setOpen] = useState(false);
-  const iconUrl = `http://localhost:3001/images/${champ.id}.png`;
+  const iconUrl = `${API_URI}/images/${champ.id}.png`;
 
   return (
     <>

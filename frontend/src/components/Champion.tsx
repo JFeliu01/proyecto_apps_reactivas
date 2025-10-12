@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { Champion } from "../types/champion";
+import { API_URI } from "../runtimeConfig";
 
 interface ChampionProps {
   champ: Champion;
@@ -7,7 +8,7 @@ interface ChampionProps {
 
 const Champion: React.FC<ChampionProps> = ({ champ }) => {
   const [open, setOpen] = useState(false);
-  const iconUrl = `/backend/champion-icons/${champ.id}.png`;
+  const iconUrl = `${API_URI}/images/${champ.id}.png`;
 
   return (
     <div className="bg-white rounded-xl shadow p-3 flex flex-col items-center cursor-pointer hover:shadow-lg transition" onClick={() => setOpen((v) => !v)}>

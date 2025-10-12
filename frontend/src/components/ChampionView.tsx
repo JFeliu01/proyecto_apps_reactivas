@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Champion } from '../types/champion';
+import { API_URI } from '../runtimeConfig';
 
 // Role and sub-role icon imports
 import FighterIcon from '../assets/Fighter_icon.png';
@@ -19,6 +20,7 @@ const TAG_ICONS: Record<string, string> = {
   Marksman: MarksmanTagIcon,
 };
 
+
 interface ChampionViewProps {
   champion: Champion | null;
   onShowGrid: () => void;
@@ -35,7 +37,7 @@ const ChampionView: React.FC<ChampionViewProps> = ({ champion, onShowGrid }) => 
     );
   }
 
-  const iconUrl = `http://localhost:3001/images/${champion.id}.png`;
+  const iconUrl = `${API_URI}/images/${champion.id}.png`;
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-8">
