@@ -1,4 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
+import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
 import './src/database';
 import cors from 'cors';
 import fs from 'fs';
@@ -8,9 +10,12 @@ import { User } from './src/models/user';
 
 const app = express();
 const PORT = 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
-app.use(cors());
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/images', express.static(path.join(__dirname, 'champion-icons')));
 
@@ -23,6 +28,43 @@ class HttpError extends Error {
     this.details = details;
   }
 }
+function signToken(userId: string): string {
+  return jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: '7d' });
+}
+
+function getTokenFromReq(req: Request): string | null {
+  const cookieToken = (req as any).cookies?.token as string | undefined;
+  if (cookieToken) return cookieToken;
+  const auth = req.headers.authorization || '';
+  if (auth.startsWith('Bearer ')) return auth.slice('Bearer '.length);
+  return null;
+}
+
+async function requireUser(req: Request) {
+  const token = getTokenFromReq(req);
+  if (!token) throw new HttpError(401, 'Unauthorized');
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as any;
+    const user = await User.findById(payload.sub).exec();
+    if (!user) throw new HttpError(401, 'Unauthorized');
+    return user;
+  } catch (_e) {
+    throw new HttpError(401, 'Unauthorized');
+  }
+}
+
+function cookieOptions() {
+  const isProd = process.env.NODE_ENV === 'production';
+  const sameSite: 'lax' | 'strict' = isProd ? 'strict' : 'lax';
+  return {
+    httpOnly: true,
+    sameSite,
+    secure: isProd,
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+}
+
 
 app.get('/api/champions', (req: Request, res: Response, next: NextFunction) => {
   fs.readFile(path.join(__dirname, 'champion.json'), 'utf8', (err, data) => {
@@ -100,11 +142,62 @@ app.delete('/api/users/:id', async (req: Request, res: Response, next: NextFunct
     if (!deleted) {
       return next(new HttpError(404, 'User not found'));
     }
-    res.status(204).send();
+    res.status(200).json({ message: 'User deleted', user: deleted });
   } catch (err: any) {
     if (err && err.name === 'CastError') {
       return next(new HttpError(400, 'Invalid id'));
     }
+    return next(err);
+  }
+});
+
+// Auth routes
+app.post('/auth/register', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, email, password } = req.body || {};
+    if (!name || !email || !password) {
+      return next(new HttpError(400, 'name, email and password are required'));
+    }
+    const user = await User.create({ name, email, password });
+    const token = signToken(user.id);
+    res.cookie('token', token, cookieOptions());
+    res.status(201).json({ user, token });
+  } catch (err: any) {
+    if (err && err.code === 11000) {
+      return next(new HttpError(409, 'Email already exists'));
+    }
+    return next(err);
+  }
+});
+
+app.post('/auth/login', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body || {};
+    if (!email || !password) {
+      return next(new HttpError(400, 'email and password are required'));
+    }
+    const user = await User.findOne({ email }).exec();
+    if (!user) return next(new HttpError(401, 'Invalid credentials'));
+    const ok = await (user as any).comparePassword(password);
+    if (!ok) return next(new HttpError(401, 'Invalid credentials'));
+    const token = signToken(user.id);
+    res.cookie('token', token, cookieOptions());
+    res.json({ user, token });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.post('/auth/logout', (req: Request, res: Response) => {
+  res.clearCookie('token', { ...cookieOptions(), maxAge: undefined });
+  res.status(200).json({ message: 'Logged out' });
+});
+
+app.get('/auth/me', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await requireUser(req);
+    res.json({ user });
+  } catch (err) {
     return next(err);
   }
 });
@@ -116,36 +209,24 @@ app.use((req: Request, res: Response) => {
 
 // Centralized error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // If headers already sent, delegate to default Express handler
   if (res.headersSent) {
     return next(err);
   }
-
-  // Known HttpError
   if (err instanceof HttpError) {
     return res.status(err.status).json({ message: err.message });
   }
-
-  // Mongoose duplicate key
   if (err && err.code === 11000) {
     return res.status(409).json({ message: 'Duplicate key' });
   }
-
-  // Mongoose invalid ObjectId
   if (err && err.name === 'CastError') {
     return res.status(400).json({ message: 'Invalid id' });
   }
-
-  // Mongoose validation
   if (err && err.name === 'ValidationError') {
     return res.status(400).json({ message: err.message });
   }
-
-  // JSON parse error from express.json()
   if (err instanceof SyntaxError) {
     return res.status(400).json({ message: 'Invalid JSON' });
   }
-
   console.error('Unhandled error:', err);
   return res.status(500).json({ message: 'Internal server error' });
 });
