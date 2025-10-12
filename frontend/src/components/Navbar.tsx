@@ -1,8 +1,6 @@
 import React from "react";
 import lolggIcon from "../assets/lolggicon.png";
 import ThemeToggle from "../ThemeToggle";
-import { useState } from "react";
-import AuthModal from "./AuthModal";
 import { useAuth } from "../AuthContext";
 
 type AppView = 'hero' | 'grid' | 'champion';
@@ -11,11 +9,11 @@ interface NavbarProps {
   onShowGrid: () => void;
   onShowHero: () => void;
   currentView: AppView;
+  onOpenAuth: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onShowGrid, onShowHero, currentView }) => {
+const Navbar: React.FC<NavbarProps> = ({ onShowGrid, onShowHero, currentView, onOpenAuth }) => {
   const { status, user } = useAuth();
-  const [authOpen, setAuthOpen] = useState(false);
   return (
     <nav className="w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800 px-4 py-3">
       <div className="flex items-center justify-between w-full">
@@ -30,7 +28,7 @@ const Navbar: React.FC<NavbarProps> = ({ onShowGrid, onShowHero, currentView }) 
           <ThemeToggle />
           {/* Auth trigger */}
           <button 
-            onClick={() => setAuthOpen(true)}
+            onClick={() => onOpenAuth()}
             className="p-2 mr-4 text-neutral-700 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-800 rounded-lg transition-colors"
             aria-label="Account"
             title={status === 'authenticated' && user ? user.email : 'Sign in'}
@@ -41,7 +39,6 @@ const Navbar: React.FC<NavbarProps> = ({ onShowGrid, onShowHero, currentView }) 
           </button>
         </div>
       </div>
-      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
     </nav>
   );
 };

@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStatus("loading");
     setError(null);
     try {
-      const { user } = await api.me();
+      const { user } = await api.me(token);
       setUser(user);
       setStatus("authenticated");
     } catch (e: any) {
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setStatus("unauthenticated");
       setError(e?.message || "Session error");
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     // Try to restore session using cookie

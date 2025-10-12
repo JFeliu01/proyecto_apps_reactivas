@@ -55,10 +55,13 @@ export async function logout() {
   return handle<void>(res);
 }
 
-export async function me() {
+export async function me(token?: string | null) {
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_URI}/auth/me`, {
     method: "GET",
     credentials: "include",
+    headers,
   });
   return handle<{ user: User }>(res);
 }

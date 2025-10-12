@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Layout from "./components/Layout";
+import { useAuth } from "./AuthContext";
 import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
 import { API_URI } from "./runtimeConfig";
@@ -67,7 +68,9 @@ function inferRolesFromTags(tags: string[] = []): Role[] {
 }
 
 export default function App() {
+  const { status } = useAuth();
   const [champions, setChampions] = useState<any | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<AppView>('hero');
@@ -111,11 +114,22 @@ export default function App() {
   }, [champions, q, role, sort]);
 
   const handleShowChampionDetails = (championId: string) => {
+    if (status !== 'authenticated') {
+      // guard: do not navigate if not authenticated
+      setCurrentView('hero');
+      setAuthOpen(true);
+      return;
+    }
     setSelectedChampionId(championId);
     setCurrentView('champion');
   };
 
   const handleShowGrid = () => {
+    if (status !== 'authenticated') {
+      setCurrentView('hero');
+      setAuthOpen(true);
+      return;
+    }
     setSelectedChampionId(null);
     setCurrentView('grid');
   };
@@ -135,9 +149,16 @@ export default function App() {
       onShowGrid={handleShowGrid}
       onShowHero={handleShowHero}
       currentView={currentView}
+      authOpen={authOpen}
+      onOpenAuth={() => setAuthOpen(true)}
+      onCloseAuth={() => setAuthOpen(false)}
+      onLoggedOut={() => {
+        setSelectedChampionId(null);
+        setCurrentView('hero');
+      }}
     >
       {currentView === 'hero' ? (
-        <HeroPage onEnterApp={() => setCurrentView('grid')} />
+        <HeroPage onEnterApp={handleShowGrid} />
       ) : currentView === 'champion' ? (
         <ChampionView 
           champion={selectedChampion}
