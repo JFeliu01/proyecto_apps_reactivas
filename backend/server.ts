@@ -151,6 +151,51 @@ app.delete('/api/users/:id', async (req: Request, res: Response, next: NextFunct
   }
 });
 
+// ===============================
+// campeones favoritos del usuario
+// ===============================
+
+// Obtener los campeones favoritos del usuario
+app.get('/api/users/:id/favorites', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await requireUser(req);
+    if (user.id !== req.params.id) {
+      return next(new HttpError(403, 'Forbidden: cannot access other user data'));
+    }
+
+    res.json({ favoriteChampions: user.favoriteChampions });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Actualizar los campeones favoritos del usuario
+app.post('/api/users/:id/favorites', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await requireUser(req);
+    if (user.id !== req.params.id) {
+      return next(new HttpError(403, 'Forbidden: cannot update other user data'));
+    }
+
+    const { favoriteChampions } = req.body || {};
+
+    if (!Array.isArray(favoriteChampions)) {
+      return next(new HttpError(400, 'favoriteChampions must be an array of strings'));
+    }
+
+    if (favoriteChampions.length > 3) {
+      return next(new HttpError(400, 'You can only select up to 3 favorite champions'));
+    }
+
+    user.favoriteChampions = favoriteChampions;
+    await user.save();
+
+    res.json({ message: 'Favorite champions updated successfully', favoriteChampions: user.favoriteChampions });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 // Auth routes
 app.post('/auth/register', async (req: Request, res: Response, next: NextFunction) => {
   try {
