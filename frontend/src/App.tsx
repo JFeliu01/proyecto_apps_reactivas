@@ -76,6 +76,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<AppView>('hero');
   const [selectedChampionId, setSelectedChampionId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const [q, setQ] = useState("");
   const [role, setRole] = useState<Role>("All");
@@ -146,6 +147,19 @@ export default function App() {
     setAuthOpen(false);        
   };
 
+  const toggleFavorite = (championId: string) => {
+    setFavorites((prev) => {
+      const isFavorite = prev.includes(championId);
+      if (isFavorite) return prev.filter((id) => id !== championId);
+
+      if (prev.length >= 3){
+        console.warn("You can only select up to 3 favorite champions.");
+        return prev;
+      }
+      return [...prev, championId];
+    });
+  };
+
   const selectedChampion = useMemo(() => {
     if (!selectedChampionId || !champions?.data) return null;
     return champions.data[selectedChampionId];
@@ -176,6 +190,7 @@ export default function App() {
         <UserProfile
           user={user}
           champions={champions?.data ?? {}}
+          favorites={favorites}
           onShowChampionDetails={handleShowChampionDetails}
           onShowGrid={handleShowGrid}
           onShowHero={handleShowHero}
@@ -238,6 +253,8 @@ export default function App() {
                 key={c.id} 
                 champ={c} 
                 onShowDetails={() => handleShowChampionDetails(c.id)}
+                onToggleFavorite={() => toggleFavorite(c.id)}
+                isFavorite={favorites.includes(c.id)}
               />
             ))}
           </div>
@@ -257,7 +274,7 @@ function SkeletonGrid() {
   );
 }
 
-function ChampionTile({ champ, onShowDetails }: { champ: any, onShowDetails: () => void }) {
+function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { champ: any, onShowDetails: () => void, onToggleFavorite: () => void, isFavorite: boolean }) {
   const [open, setOpen] = useState(false);
   const iconUrl = `${API_URI}/images/${champ.id}.png`;
 
@@ -329,6 +346,18 @@ function ChampionTile({ champ, onShowDetails }: { champ: any, onShowDetails: () 
               </div>
             </div>
             <div className="flex justify-end gap-2 p-4 border-t border-neutral-200 dark:border-neutral-800">
+              <button onClick={onToggleFavorite}
+                className={["rounded-xl border px-4 py-2 text-sm font-semibold flex items-center gap-2 transition",
+                  isFavorite
+                    ? "bg-yellow-400 text-neutral-900 border-yellow-500 shadow-inner hover:bg-yellow-500"
+                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                ].join(" ")}
+              >
+                <span className={isFavorite ? "text-lg" : "text-lg opacity-70"}>
+                  {isFavorite ? "★" : "☆"}
+                </span>
+                {isFavorite ? "Favorito" : "Favorite"}
+              </button>
               <button onClick={() => setOpen(false)} className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100">Close</button>
               <button onClick={onShowDetails} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
             </div>

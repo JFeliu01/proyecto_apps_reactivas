@@ -1,17 +1,18 @@
-import React from 'react';
+//import React from 'react';
 import type { Champion } from '../types/champion';
 import { API_URI } from '../runtimeConfig';
 
 interface UserProfileProps {
-  user: { name: string; email: string; favorites?: string[] };
+  user: { name: string; email: string };
   champions: Record<string, Champion>;
+  favorites: string[];
   onShowChampionDetails: (id: string) => void;
   onShowGrid: () => void;
   onShowHero: () => void;
 }
 
-export default function UserProfile({ user, champions, onShowChampionDetails, onShowGrid }: UserProfileProps) {
-  const favoriteChamps = user.favorites?.map(id => champions[id]).filter(Boolean) || [];
+export default function UserProfile({ user, champions, favorites, onShowChampionDetails, onShowGrid }: UserProfileProps) {
+  const favoriteChamps = favorites.map(id => champions[id]).filter(Boolean);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16">
