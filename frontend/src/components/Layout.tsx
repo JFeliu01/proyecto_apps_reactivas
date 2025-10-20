@@ -2,7 +2,7 @@ import React from "react";
 import Navbar from "./Navbar";
 import AuthModal from "./AuthModal";
 
-type AppView = 'hero' | 'grid' | 'champion';
+type AppView = 'hero' | 'grid' | 'champion' | 'profile';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,9 +13,10 @@ interface LayoutProps {
   onOpenAuth: () => void;
   onCloseAuth: () => void;
   onLoggedOut?: () => void;
+  onShowProfile: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, onShowGrid, onShowHero, currentView, authOpen, onOpenAuth, onCloseAuth, onLoggedOut }) => {
+const Layout: React.FC<LayoutProps> = ({ children, onShowGrid, onShowHero, currentView, authOpen, onOpenAuth, onCloseAuth, onLoggedOut,onShowProfile }) => {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
       <Navbar 
@@ -27,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onShowGrid, onShowHero, curre
       <main className="flex-1">
         {children}
       </main>
-      {authOpen && <AuthModal onClose={onCloseAuth} onLoggedOut={onLoggedOut} />}
+      {authOpen && <AuthModal onClose={onCloseAuth} onLoggedOut={onLoggedOut} onShowProfile={onShowProfile}/>}
     </div>
   );
 };

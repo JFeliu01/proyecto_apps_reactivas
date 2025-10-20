@@ -2,10 +2,12 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 export interface UserDocument extends Document {
+  _id: string;
   name: string;
   email: string;
   password: string; // stored as bcrypt hash
   favoriteChampions: string[];
+  profilePicture?: string; //ver si dejar esto
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidate: string): Promise<boolean>;

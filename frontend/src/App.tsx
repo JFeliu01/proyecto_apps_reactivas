@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import { useAuth } from "./AuthContext";
 import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
+import UserProfile from "./components/Profile";
 import { API_URI } from "./runtimeConfig";
 
 // Role icons imports
@@ -34,7 +35,7 @@ const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
 // Views for the application (needs to be SPA)
-type AppView = 'hero' | 'grid' | 'champion'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
+type AppView = 'hero' | 'grid' | 'champion' | 'profile'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
 
 // Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
@@ -68,7 +69,7 @@ function inferRolesFromTags(tags: string[] = []): Role[] {
 }
 
 export default function App() {
-  const { status } = useAuth();
+  const { status, user} = useAuth();
   const [champions, setChampions] = useState<any | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -139,6 +140,12 @@ export default function App() {
     setCurrentView('hero');
   };
 
+  const handleShowProfile = () => {
+    setSelectedChampionId(null);
+    setCurrentView('profile'); 
+    setAuthOpen(false);        
+  };
+
   const selectedChampion = useMemo(() => {
     if (!selectedChampionId || !champions?.data) return null;
     return champions.data[selectedChampionId];
@@ -148,6 +155,7 @@ export default function App() {
     <Layout 
       onShowGrid={handleShowGrid}
       onShowHero={handleShowHero}
+      onShowProfile={handleShowProfile}
       currentView={currentView}
       authOpen={authOpen}
       onOpenAuth={() => setAuthOpen(true)}
@@ -164,7 +172,16 @@ export default function App() {
           champion={selectedChampion}
           onShowGrid={handleShowGrid}
         />
-      ) : (
+      ) : currentView === "profile" && user ? (
+        // 🔹 NUEVO BLOQUE: Vista de perfil
+        <UserProfile
+          user={user}
+          champions={champions?.data ?? {}}
+          onShowChampionDetails={handleShowChampionDetails}
+          onShowGrid={handleShowGrid}
+          onShowHero={handleShowHero}
+        />
+      ): (
         <div className="mx-auto w-full max-w-7xl px-4 pb-16">
           {/* Controls */}
           <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/95 dark:bg-neutral-900 backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-neutral-950/40">

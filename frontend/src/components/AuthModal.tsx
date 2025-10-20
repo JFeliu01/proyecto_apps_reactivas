@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "../AuthContext";
 
-export default function AuthModal({ onClose, onLoggedOut }: { onClose: () => void, onLoggedOut?: () => void }) {
+export default function AuthModal({ onClose, onLoggedOut, onShowProfile}: { onClose: () => void, onLoggedOut?: () => void, onShowProfile: () => void }) {
   const { status, user, login, register, logout } = useAuth();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
@@ -40,10 +40,24 @@ export default function AuthModal({ onClose, onLoggedOut }: { onClose: () => voi
           {status === "authenticated" && user ? (
             <div className="space-y-3">
               <div className="text-sm">Signed in as <span className="font-semibold">{user.email}</span></div>
-              <button
-                onClick={async () => { await logout(); onLoggedOut?.(); onClose(); }}
-                className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700"
-              >Logout</button>
+              <div className="flex flex-col gap-2">
+                <button //Ver perfil
+                  onClick={() => {
+                    onShowProfile?.(); 
+                    onClose(); 
+                  }}
+                  className="rounded-xl border border-transparent bg-sky-500 px-3 py-1 text-sm font-semibold text-white hover:bg-sky-600"
+                >
+                  View Profile
+                </button>
+
+
+                <button //Salir de la cuenta
+                  onClick={async () => {await logout(), onLoggedOut?.(), onClose()}}
+                  className="w-full rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                >Logout
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-3">

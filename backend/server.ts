@@ -151,9 +151,9 @@ app.delete('/api/users/:id', async (req: Request, res: Response, next: NextFunct
   }
 });
 
-// ===============================
-// campeones favoritos del usuario
-// ===============================
+
+
+
 
 // Obtener los campeones favoritos del usuario
 app.get('/api/users/:id/favorites', async (req: Request, res: Response, next: NextFunction) => {
@@ -242,6 +242,22 @@ app.get('/auth/me', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await requireUser(req);
     res.json({ user });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+//ruta para el perfil
+app.get('/api/profile', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await requireUser(req);
+    res.json({ 
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      favoriteChampions: user.favoriteChampions,
+      createdAt: user.createdAt,
+    });
   } catch (err) {
     return next(err);
   }
