@@ -77,6 +77,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<AppView>('hero');
   const [selectedChampionId, setSelectedChampionId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [role, setRole] = useState<Role>("All");
@@ -153,7 +154,8 @@ export default function App() {
       if (isFavorite) return prev.filter((id) => id !== championId);
 
       if (prev.length >= 3){
-        console.warn("You can only select up to 3 favorite champions.");
+        setFavoriteError("You can only select up to 3 favorite champions.");
+        setTimeout(() => setFavoriteError(null), 3000);
         return prev;
       }
       return [...prev, championId];
@@ -166,6 +168,7 @@ export default function App() {
   }, [selectedChampionId, champions]);
 
   return (
+    <>
     <Layout 
       onShowGrid={handleShowGrid}
       onShowHero={handleShowHero}
@@ -261,6 +264,13 @@ export default function App() {
         </div>
       )}
     </Layout>
+
+    {favoriteError && (
+      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in">
+        {favoriteError}
+      </div>
+    )}
+    </>
   );
 }
 
