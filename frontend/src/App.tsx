@@ -35,7 +35,7 @@ const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
 // Views for the application (needs to be SPA)
-type AppView = 'hero' | 'grid' | 'champion' | 'profile'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
+export type AppView = 'hero' | 'grid' | 'champion' | 'profile'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
 
 // Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
@@ -173,7 +173,6 @@ export default function App() {
           onShowGrid={handleShowGrid}
         />
       ) : currentView === "profile" && user ? (
-        // 🔹 NUEVO BLOQUE: Vista de perfil
         <UserProfile
           user={user}
           champions={champions?.data ?? {}}

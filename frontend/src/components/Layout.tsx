@@ -1,8 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import AuthModal from "./AuthModal";
-
-type AppView = 'hero' | 'grid' | 'champion' | 'profile';
+import type { AppView } from "../App";
 
 interface LayoutProps {
   children: React.ReactNode;

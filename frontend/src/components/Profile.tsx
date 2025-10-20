@@ -10,11 +10,20 @@ interface UserProfileProps {
   onShowHero: () => void;
 }
 
-export default function UserProfile({ user, champions, onShowChampionDetails }: UserProfileProps) {
+export default function UserProfile({ user, champions, onShowChampionDetails, onShowGrid }: UserProfileProps) {
   const favoriteChamps = user.favorites?.map(id => champions[id]).filter(Boolean) || [];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pb-16">
+      <button
+        onClick={onShowGrid}
+        className="mb-6 flex items-center gap-2 px-4 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to champion list
+      </button>
       <h2 className="text-2xl font-bold mb-4">Profile</h2>
       <div className="mb-6 space-y-1">
         <div><strong>Name:</strong> {user.name}</div>
