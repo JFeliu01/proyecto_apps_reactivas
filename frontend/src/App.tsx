@@ -355,7 +355,7 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 </ul>
               </div>
             </div>
-            <div className="flex justify-end gap-2 p-4 border-t border-neutral-200 dark:border-neutral-800">
+            <div className="flex justify-between items-center p-4 border-t border-neutral-200 dark:border-neutral-800">
               <button onClick={onToggleFavorite}
                 className={["rounded-xl border px-4 py-2 text-sm font-semibold flex items-center gap-2 transition",
                   isFavorite
@@ -368,8 +368,12 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 </span>
                 {isFavorite ? "Favorito" : "Favorite"}
               </button>
-              <button onClick={() => setOpen(false)} className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100">Close</button>
-              <button onClick={onShowDetails} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
+
+              <div className="flex gap-2">
+                <button onClick={() => setOpen(false)} className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100">Close</button>
+                <button onClick={onShowDetails} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
+              </div>
+              
             </div>
           </div>
         </div>
