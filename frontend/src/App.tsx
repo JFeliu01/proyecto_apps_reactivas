@@ -439,7 +439,7 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 <span className={isFavorite ? "text-lg" : "text-lg opacity-70"}>
                   {isFavorite ? "★" : "☆"}
                 </span>
-                {isFavorite ? "Favorito" : "Favorite"}
+                {isFavorite ? "Favorite" : "Favorite"}
               </button>
 
               <div className="flex gap-2">
