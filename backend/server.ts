@@ -9,7 +9,8 @@ import type { ChampionData } from './src/models/champion';
 import { User } from './src/models/user';
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+const HOST = process.env.HOST || 'localhost';
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
@@ -17,7 +18,13 @@ app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/images', express.static(path.join(__dirname, 'champion-icons')));
+app.use('/images', express.static(path.join(__dirname, '../champion-icons')));
+
+// Servir frontend estático en producción
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '../../frontend-dist');
+  app.use(express.static(frontendPath));
+}
 
 class HttpError extends Error {
   status: number;
@@ -67,7 +74,7 @@ function cookieOptions() {
 
 
 app.get('/api/champions', (req: Request, res: Response, next: NextFunction) => {
-  fs.readFile(path.join(__dirname, 'champion.json'), 'utf8', (err, data) => {
+  fs.readFile(path.join(__dirname, '../champion.json'), 'utf8', (err, data) => {
     if (err) {
       return next(new HttpError(500, 'Error reading champion data'));
     }
@@ -203,12 +210,16 @@ app.post('/auth/register', async (req: Request, res: Response, next: NextFunctio
     if (!name || !email || !password) {
       return next(new HttpError(400, 'name, email and password are required'));
     }
+    console.log(`[REGISTER] Attempting to create user with email: ${email}`);
     const user = await User.create({ name, email, password });
+    console.log(`[REGISTER] User created successfully: ${user.id}`);
     const token = signToken(user.id);
     res.cookie('token', token, cookieOptions());
     res.status(201).json({ user, token });
   } catch (err: any) {
+    console.error('[REGISTER] Error:', err);
     if (err && err.code === 11000) {
+      console.error(`[REGISTER] Duplicate key error for email: ${req.body.email}`);
       return next(new HttpError(409, 'Email already exists'));
     }
     return next(err);
@@ -263,8 +274,20 @@ app.get('/api/profile', async (req: Request, res: Response, next: NextFunction) 
   }
 });
 
-// 404 handler for unknown routes
-app.use((req: Request, res: Response) => {
+// 404 handler for unknown API/auth routes
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Si es una ruta de API o auth que no existe, devolver 404 JSON
+  if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/images')) {
+    return res.status(404).json({ message: 'Not found' });
+  }
+  
+  // Para cualquier otra ruta, en producción servir el frontend
+  if (process.env.NODE_ENV === 'production') {
+    const frontendPath = path.join(__dirname, '../../frontend-dist/index.html');
+    return res.sendFile(frontendPath);
+  }
+  
+  // En desarrollo, 404
   res.status(404).json({ message: 'Not found' });
 });
 
@@ -292,6 +315,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   return res.status(500).json({ message: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on http://${HOST}:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });

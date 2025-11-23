@@ -11,7 +11,8 @@
     "noImplicitAny": true
   },
   "include": [
-    "server.ts"
+    "server.ts",
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"

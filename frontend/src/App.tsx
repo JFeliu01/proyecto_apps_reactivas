@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -37,7 +37,8 @@ import MarksmanTagIcon from "./assets/Marksman_icon.png";
 const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
-export type AppView = "hero" | "grid" | "champion" | "profile";
+import type { AppView } from "./types/app";
+export type { AppView };
 
 const ROLE_ICONS: Record<Role, string> = {
   All: AllIcon,
@@ -199,6 +200,7 @@ function AppInner() {
     });
   };
 
+  // @ts-expect-error - Variable will be used in future feature
   const selectedChampion = useMemo(() => {
     if (!selectedChampionId || !champions?.data) return null;
     return champions.data[selectedChampionId];

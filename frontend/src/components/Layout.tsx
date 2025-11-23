@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "./Navbar";
 import AuthModal from "./AuthModal";
-import type { AppView } from "../App";
+import type { AppView } from "../types/app";
 
 interface LayoutProps {
   children: React.ReactNode;

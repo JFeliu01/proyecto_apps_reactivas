@@ -1,11 +1,16 @@
-# Reactive Applications Project
+# Reactive Applications Project - LoL.GG
 
-This project consists of a frontend developed with React and a simple backend using `json-server`. It is a clone of pages like [u.gg](https://u.gg/) and [op.gg](https://op.gg/) where you can check statistics and builds for champions from the video game League of Legends using the same Riot API (TODO).
+This project consists of a frontend developed with React and a backend using Express + MongoDB. It is a clone of pages like [u.gg](https://u.gg/) and [op.gg](https://op.gg/) where you can check statistics and builds for champions from the video game League of Legends.
+
+## 🚀 Quick Deployment
+
+**Want to deploy to production?** See [`LEEME_PRIMERO.md`](LEEME_PRIMERO.md) for quick deployment guide.
 
 ## Requirements
 
-- Node.js (v22 or higher)
+- Node.js (v18 or higher)
 - npm
+- MongoDB (for backend)
 
 ## Installation and Execution
 
@@ -21,9 +26,18 @@ This project consists of a frontend developed with React and a simple backend us
     npm install
     ```
 
-3.  **Start the server:**
+3.  **Start MongoDB:**
     ```bash
-    npm start
+    # Linux/Mac
+    sudo systemctl start mongodb
+    
+    # Or if using Docker
+    docker run -d -p 27017:27017 mongo
+    ```
+
+4.  **Start the server:**
+    ```bash
+    npm run dev
     ```
     The backend will be running at `http://localhost:3001`.
 
@@ -77,3 +91,53 @@ This project consists of a frontend developed with React and a simple backend us
     User Login — Logs in with an existing user and confirms authentication is successful.
 
     Favorites CRUD — Adds three favorite champions and later removes them from the user profile, verifying both operations.
+
+## Production Deployment
+
+### Quick Start: Run the deployment script for your operating system:
+
+**Windows:**
+```powershell
+.\deploy.ps1
+```
+
+**Linux/Mac:**
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+After running the deployment script, you will need to manually configure the server, connect using:
+
+```bash
+ssh -p 219 fullstack@fullstack.dcc.uchile.cl
+```
+
+Then  kill the node app using:
+```bash
+pkill -f 'lolgg/backend'
+```
+
+Verify the port is free using:
+```bash
+ss -tlnp | grep 7153
+```
+
+If the port is not free, kill the process reading its PID and using:
+```bash
+kill -9 <PID>
+```
+
+Then run the setup-server.sh script:
+```bash
+cd ~/lolgg/backend
+chmod +x setup-server.sh
+./setup-server.sh
+```
+
+Then start the node app using:
+```bash
+nohup npm start > server.log 2>&1 &
+```
+
+Then you can access the application at: http://fullstack.dcc.uchile.cl:7153

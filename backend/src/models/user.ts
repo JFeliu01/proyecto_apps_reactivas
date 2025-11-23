@@ -58,6 +58,6 @@ UserSchema.methods.comparePassword = async function (candidate: string) {
   return bcrypt.compare(candidate, this.password);
 };
 
-export const User: Model<UserDocument> = mongoose.models.User || mongoose.model<UserDocument>('User', UserSchema);
+export const User: Model<UserDocument> = mongoose.models.User || mongoose.model<UserDocument>('User', UserSchema, 'users_lolgg');
 
 

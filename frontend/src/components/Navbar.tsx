@@ -2,8 +2,7 @@ import React from "react";
 import lolggIcon from "../assets/lolggicon.png";
 import ThemeToggle from "../ThemeToggle";
 import { useAuth } from "../AuthContext";
-
-type AppView = 'hero' | 'grid' | 'champion';
+import type { AppView } from "../types/app";
 
 interface NavbarProps {
   onShowGrid: () => void;
@@ -12,7 +11,7 @@ interface NavbarProps {
   onOpenAuth: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onShowGrid, onShowHero, currentView, onOpenAuth }) => {
+const Navbar: React.FC<NavbarProps> = ({ onShowHero, onOpenAuth }) => {
   const { status, user } = useAuth();
   return (
     <nav className="w-full bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800 px-4 py-3">
