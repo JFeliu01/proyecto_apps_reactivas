@@ -1,11 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import Layout from "./components/Layout";
 import { useAuth } from "./AuthContext";
 import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
 import UserProfile from "./components/Profile";
 import { API_URI } from "./runtimeConfig";
-// import ExampleStoreUsage from "./components/ExampleStoreUsage";
 
 // Role icons imports
 import AllIcon from "./assets/120px-All_icon.png";
@@ -24,21 +31,14 @@ import SupportTagIcon from "./assets/Support_icon.png";
 import MarksmanTagIcon from "./assets/Marksman_icon.png";
 
 // ------------------------------------------------------------------
-// OPGG-style Champion Grid
-// - Uses a locally served champions JSON: /backend/champion.json
-// - Uses locally saved square icons:   /backend/champion-icons/<Id>.png
-// - Tailwind-only, no extra deps. Clean, responsive, keyboard friendly.
+// OPGG-style Champion Grid (con React Router)
 // ------------------------------------------------------------------
 
-
-// Utility: very light role mapping to mimic op.gg filters
 const ROLE_TABS = ["All", "Top", "Jungle", "Mid", "ADC", "Support"] as const;
 type Role = typeof ROLE_TABS[number];
 
-// Views for the application (needs to be SPA)
-export type AppView = 'hero' | 'grid' | 'champion' | 'profile'; // Usaremos useState para manejar las vistas sin modificar el DOM directamente
+export type AppView = "hero" | "grid" | "champion" | "profile";
 
-// Role icons mapping
 const ROLE_ICONS: Record<Role, string> = {
   All: AllIcon,
   Top: TopIcon,
@@ -48,7 +48,6 @@ const ROLE_ICONS: Record<Role, string> = {
   Support: SupportIcon,
 };
 
-// Subrole/Tag icons mapping
 const TAG_ICONS: Record<string, string> = {
   Tank: TankIcon,
   Mage: MageIcon,
@@ -69,14 +68,32 @@ function inferRolesFromTags(tags: string[] = []): Role[] {
   return Array.from(set.size ? set : ["All"]);
 }
 
+/*
+  We export default App which wraps AppInner with BrowserRouter so useNavigate
+  can be used inside AppInner (react-router hook requirement).
+*/
+
 export default function App() {
-  const { status, user} = useAuth();
+  return (
+    <BrowserRouter>
+      <AppInner />
+    </BrowserRouter>
+  );
+}
+
+function AppInner() {
+  const { status, user } = useAuth();
+  const navigate = useNavigate();
+
   const [champions, setChampions] = useState<any | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<AppView>('hero');
-  const [selectedChampionId, setSelectedChampionId] = useState<string | null>(null);
+  // keep currentView only for passing into Layout to preserve any styling / active state uses
+  const [currentView, setCurrentView] = useState<AppView>("hero");
+  const [selectedChampionId, setSelectedChampionId] = useState<string | null>(
+    null
+  );
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteError, setFavoriteError] = useState<string | null>(null);
 
@@ -84,6 +101,7 @@ export default function App() {
   const [role, setRole] = useState<Role>("All");
   const [sort, setSort] = useState<"alpha" | "difficulty">("alpha");
 
+  // fetch champions (same as before)
   useEffect(() => {
     fetch(`${API_URI}/api/champions`)
       .then((r) => {
@@ -104,7 +122,11 @@ export default function App() {
 
     if (q.trim()) {
       const needle = q.trim().toLowerCase();
-      arr = arr.filter((c) => c.name.toLowerCase().includes(needle) || c.id.toLowerCase().includes(needle));
+      arr = arr.filter(
+        (c) =>
+          c.name.toLowerCase().includes(needle) ||
+          c.id.toLowerCase().includes(needle)
+      );
     }
     if (role !== "All") {
       arr = arr.filter((c) => (c._roles as Role[]).includes(role));
@@ -112,41 +134,55 @@ export default function App() {
     if (sort === "alpha") {
       arr = arr.sort((a, b) => a.name.localeCompare(b.name));
     } else {
-      arr = arr.sort((a, b) => (b.info?.difficulty ?? 0) - (a.info?.difficulty ?? 0));
+      arr = arr.sort(
+        (a, b) => (b.info?.difficulty ?? 0) - (a.info?.difficulty ?? 0)
+      );
     }
     return arr;
   }, [champions, q, role, sort]);
 
+  // --- Navigation helpers that preserve your original auth behavior ---
   const handleShowChampionDetails = (championId: string) => {
-    if (status !== 'authenticated') {
-      // guard: do not navigate if not authenticated
-      setCurrentView('hero');
+    if (status !== "authenticated") {
+      // guard identical to original: open auth modal and show hero
+      setCurrentView("hero");
       setAuthOpen(true);
+      // do not navigate
       return;
     }
     setSelectedChampionId(championId);
-    setCurrentView('champion');
+    setCurrentView("champion");
+    navigate(`/champion/${encodeURIComponent(championId)}`);
   };
 
   const handleShowGrid = () => {
-    if (status !== 'authenticated') {
-      setCurrentView('hero');
+    if (status !== "authenticated") {
+      setCurrentView("hero");
       setAuthOpen(true);
       return;
     }
     setSelectedChampionId(null);
-    setCurrentView('grid');
+    setCurrentView("grid");
+    navigate("/grid");
   };
-  
+
   const handleShowHero = () => {
     setSelectedChampionId(null);
-    setCurrentView('hero');
+    setCurrentView("hero");
+    navigate("/");
   };
 
   const handleShowProfile = () => {
+    // original behavior set authOpen false when going to profile
     setSelectedChampionId(null);
-    setCurrentView('profile'); 
-    setAuthOpen(false);        
+    setCurrentView("profile");
+    setAuthOpen(false);
+    if (status === "authenticated") {
+      navigate("/profile");
+    } else {
+      // if not authenticated, open modal (original behavior opened modal in some flows)
+      setAuthOpen(true);
+    }
   };
 
   const toggleFavorite = (championId: string) => {
@@ -154,7 +190,7 @@ export default function App() {
       const isFavorite = prev.includes(championId);
       if (isFavorite) return prev.filter((id) => id !== championId);
 
-      if (prev.length >= 3){
+      if (prev.length >= 3) {
         setFavoriteError("You can only select up to 3 favorite champions.");
         setTimeout(() => setFavoriteError(null), 3000);
         return prev;
@@ -168,124 +204,160 @@ export default function App() {
     return champions.data[selectedChampionId];
   }, [selectedChampionId, champions]);
 
+  // --- Render Layout and Routes ---
   return (
     <>
-    <Layout 
-      onShowGrid={handleShowGrid}
-      onShowHero={handleShowHero}
-      onShowProfile={handleShowProfile}
-      currentView={currentView}
-      authOpen={authOpen}
-      onOpenAuth={() => setAuthOpen(true)}
-      onCloseAuth={() => setAuthOpen(false)}
-      onLoggedOut={() => {
-        setSelectedChampionId(null);
-        setCurrentView('hero');
-      }}
-    >
-      {currentView === 'hero' ? (
-        <HeroPage onEnterApp={handleShowGrid} />
-      ) : currentView === 'champion' ? (
-        <ChampionView 
-          champion={selectedChampion}
-          onShowGrid={handleShowGrid}
-        />
-      ) : currentView === "profile" && user ? (
-        <UserProfile
-          user={user}
-          champions={champions?.data ?? {}}
-          favorites={favorites}
-          onShowChampionDetails={handleShowChampionDetails}
-          onShowGrid={handleShowGrid}
-          onShowHero={handleShowHero}
-        />
-      ): (
-        <div className="mx-auto w-full max-w-7xl px-4 pb-16">
-          {/* Controls */}
-          <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/95 dark:bg-neutral-900 backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-neutral-950/40">
-            <div className="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2 overflow-x-auto">
-                {ROLE_TABS.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setRole(t)}
-                    className={[
-                      "px-3 py-2 rounded-full text-sm whitespace-nowrap border transition flex items-center gap-2",
-                      role === t
-                        ? "bg-sky-500 text-white border-transparent shadow"
-                        : "bg-neutral-100/70 dark:bg-neutral-900/70 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-900",
-                    ].join(" ")}
-                  >
-                    <img 
-                      src={ROLE_ICONS[t]} 
-                      alt={`${t} role icon`} 
-                      className="w-4 h-4 object-contain"
-                    />
-                    {t}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="relative w-64 max-w-[70vw]">
-                  <input
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder="Search champion…"
-                    className="w-full rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-10 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  />
-                  <svg viewBox="0 0 24 24" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16a6.471 6.471 0 004.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14m-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                </div>
-                <select
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as any)}
-                  className="rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                  aria-label="Sort champions by"
-                >
-                  <option value="alpha">Alphabetical</option>
-                  <option value="difficulty">By Difficulty</option>
-                </select>
-              </div>
-            </div>
-          </div>
+      <Layout
+        onShowGrid={handleShowGrid}
+        onShowHero={handleShowHero}
+        onShowProfile={handleShowProfile}
+        currentView={currentView}
+        authOpen={authOpen}
+        onOpenAuth={() => setAuthOpen(true)}
+        onCloseAuth={() => setAuthOpen(false)}
+        onLoggedOut={() => {
+          setSelectedChampionId(null);
+          setCurrentView("hero");
+          navigate("/");
+        }}
+      >
+        <Routes>
+          {/* HERO */}
+          <Route
+            path="/"
+            element={<HeroPage onEnterApp={handleShowGrid} />}
+          />
 
-          {/* Grid */}
-          <div className="mt-6 grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
-            {loading && <SkeletonGrid />}
-            {error && <div className="text-red-400 text-sm">Error: {error}</div>}
-            {!loading && !error && list.map((c: any) => (
-              <ChampionTile 
-                key={c.id} 
-                champ={c} 
-                onShowDetails={() => handleShowChampionDetails(c.id)}
-                onToggleFavorite={() => toggleFavorite(c.id)}
-                isFavorite={favorites.includes(c.id)}
-              />
-            ))}
-          </div>
+          {/* GRID */}
+          <Route
+            path="/grid"
+            element={
+              status !== "authenticated" ? (
+                <Navigate to="/" />
+              ) : (
+                <div className="mx-auto w-full max-w-7xl px-4 pb-16">
+                  {/* Controls */}
+                  <div className="sticky top-0 z-10 -mx-4 border-b border-neutral-200/60 dark:border-neutral-800/60 bg-white/95 dark:bg-neutral-900 backdrop-blur supports-[backdrop-filter]:bg-white/40 dark:supports-[backdrop-filter]:bg-neutral-950/40">
+                    <div className="mx-auto max-w-7xl px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex items-center gap-2 overflow-x-auto">
+                        {ROLE_TABS.map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => setRole(t)}
+                            className={[
+                              "px-3 py-2 rounded-full text-sm whitespace-nowrap border transition flex items-center gap-2",
+                              role === t
+                                ? "bg-sky-500 text-white border-transparent shadow"
+                                : "bg-neutral-100/70 dark:bg-neutral-900/70 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-900",
+                            ].join(" ")}
+                          >
+                            <img
+                              src={ROLE_ICONS[t]}
+                              alt={`${t} role icon`}
+                              className="w-4 h-4 object-contain"
+                            />
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-64 max-w-[70vw]">
+                          <input
+                            value={q}
+                            onChange={(e) => setQ(e.target.value)}
+                            placeholder="Search champion…"
+                            className="w-full rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-10 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-500 dark:placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                          />
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-500 dark:text-neutral-400"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16a6.471 6.471 0 004.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14m-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                            />
+                          </svg>
+                        </div>
+                        <select
+                          value={sort}
+                          onChange={(e) => setSort(e.target.value as any)}
+                          className="rounded-xl border border-neutral-300 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                          aria-label="Sort champions by"
+                        >
+                          <option value="alpha">Alphabetical</option>
+                          <option value="difficulty">By Difficulty</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grid */}
+                  <div className="mt-6 grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4">
+                    {loading && <SkeletonGrid />}
+                    {error && <div className="text-red-400 text-sm">Error: {error}</div>}
+                    {!loading &&
+                      !error &&
+                      list.map((c: any) => (
+                        <ChampionTile
+                          key={c.id}
+                          champ={c}
+                          onShowDetails={() => handleShowChampionDetails(c.id)}
+                          onToggleFavorite={() => toggleFavorite(c.id)}
+                          isFavorite={favorites.includes(c.id)}
+                        />
+                      ))}
+                  </div>
+                </div>
+              )
+            }
+          />
+
+          {/* CHAMPION DETAILS (reads :championId param) */}
+          <Route
+            path="/champion/:championId"
+            element={<ChampionRoute champions={champions?.data ?? {}} onShowGrid={handleShowGrid} />}
+          />
+
+          {/* PROFILE */}
+          <Route
+            path="/profile"
+            element={
+              status === "authenticated" && user ? (
+                <UserProfile
+                  user={user}
+                  champions={champions?.data ?? {}}
+                  favorites={favorites}
+                  onShowChampionDetails={handleShowChampionDetails}
+                  onShowGrid={handleShowGrid}
+                  onShowHero={handleShowHero}
+                />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+        </Routes>
+      </Layout>
+
+      {favoriteError && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in">
+          {favoriteError}
         </div>
       )}
-    </Layout>
-
-    {favoriteError && (
-      <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in">
-        {favoriteError}
-      </div>
-    )}
     </>
   );
 }
 
-function SkeletonGrid() {
-  return (
-    <>
-      {Array.from({ length: 24 }).map((_, i) => (
-        <div key={i} className="aspect-square rounded-xl bg-neutral-200/60 dark:bg-neutral-900/60 border border-neutral-300 dark:border-neutral-800 animate-pulse" />
-      ))}
-    </>
-  );
+/* Route wrapper for champion details to read the param and render your existing ChampionView */
+function ChampionRoute({ champions, onShowGrid }: { champions: any; onShowGrid: () => void }) {
+  const { championId } = useParams<{ championId: string }>();
+  const champion = championId ? champions[championId] : null;
+  // preserve original back handler: call onShowGrid (it already performs auth-checks and navigation)
+  return <ChampionView champion={champion} onShowGrid={onShowGrid} />;
 }
 
-function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { champ: any, onShowDetails: () => void, onToggleFavorite: () => void, isFavorite: boolean }) {
+/* ChampionTile left intact: uses provided callbacks (onShowDetails, onToggleFavorite) */
+function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { champ: any; onShowDetails: () => void; onToggleFavorite: () => void; isFavorite: boolean; }) {
   const [open, setOpen] = useState(false);
   const iconUrl = `${API_URI}/images/${champ.id}.png`;
 
@@ -302,7 +374,6 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
         />
-        {/* Bottom caption like op.gg */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
           <div className="text-[11px] sm:text-xs font-semibold tracking-wide text-white text-center drop-shadow">
             {champ.name}
@@ -310,7 +381,6 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
         </div>
       </button>
 
-      {/* Minimal modal */}
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
@@ -327,9 +397,9 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 {(champ.tags || []).map((t: string) => (
                   <span key={t} className="rounded-full border border-neutral-300 dark:border-neutral-700 bg-neutral-200 dark:bg-neutral-800 px-2 py-1 text-xs text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
                     {TAG_ICONS[t] && (
-                      <img 
-                        src={TAG_ICONS[t]} 
-                        alt={`${t} icon`} 
+                      <img
+                        src={TAG_ICONS[t]}
+                        alt={`${t} icon`}
                         className="w-3 h-3 object-contain"
                       />
                     )}
@@ -338,6 +408,7 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 ))}
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4 p-4">
               <div>
                 <h3 className="mb-2 text-sm font-semibold text-neutral-600 dark:text-neutral-300">Info</h3>
@@ -356,6 +427,7 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
                 </ul>
               </div>
             </div>
+
             <div className="flex justify-between items-center p-4 border-t border-neutral-200 dark:border-neutral-800">
               <button onClick={onToggleFavorite}
                 className={["rounded-xl border px-4 py-2 text-sm font-semibold flex items-center gap-2 transition",
@@ -372,9 +444,9 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
 
               <div className="flex gap-2">
                 <button onClick={() => setOpen(false)} className="rounded-xl border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-4 py-2 text-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100">Close</button>
-                <button onClick={onShowDetails} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
+                <button onClick={() => { setOpen(false); onShowDetails(); }} className="rounded-xl border border-transparent bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600">View Details</button>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -383,3 +455,12 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
   );
 }
 
+function SkeletonGrid() {
+  return (
+    <>
+      {Array.from({ length: 24 }).map((_, i) => (
+        <div key={i} className="aspect-square rounded-xl bg-neutral-200/60 dark:bg-neutral-900/60 border border-neutral-300 dark:border-neutral-800 animate-pulse" />
+      ))}
+    </>
+  );
+}
