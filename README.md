@@ -46,3 +46,34 @@ This project consists of a frontend developed with React and a simple backend us
     npm run dev
     ```
     The application will be available at `http://localhost:5173` (or on the port that Vite indicates in the terminal).
+
+### Tests E2E
+
+1.  **Open two separate terminals and run both the frontend and the backend. Make sure both servers are running before executing the tests.**
+
+2. **Open a third terminal and navigate to the /test_e2e directory.**
+
+3. **Run the Playwright installation command (only required the first time)**
+
+    ```bash
+    npx playwright install
+    ```
+4. **Run the Tests**
+
+    ```bash
+    npx playwright test
+    ```
+
+    **use this command if you want to see it with the UI**
+
+    ```bash
+    npx playwright test --ui   
+    ```
+
+    **There are three end-to-end tests included:**
+
+    User Registration — Creates a new account and verifies the user is logged in after registering.
+
+    User Login — Logs in with an existing user and confirms authentication is successful.
+
+    Favorites CRUD — Adds three favorite champions and later removes them from the user profile, verifying both operations.
