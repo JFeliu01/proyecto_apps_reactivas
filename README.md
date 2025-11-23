@@ -2,10 +2,6 @@
 
 This project consists of a frontend developed with React and a backend using Express + MongoDB. It is a clone of pages like [u.gg](https://u.gg/) and [op.gg](https://op.gg/) where you can check statistics and builds for champions from the video game League of Legends.
 
-## 🚀 Quick Deployment
-
-**Want to deploy to production?** See [`LEEME_PRIMERO.md`](LEEME_PRIMERO.md) for quick deployment guide.
-
 ## Requirements
 
 - Node.js (v18 or higher)
