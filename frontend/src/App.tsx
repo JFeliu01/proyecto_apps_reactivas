@@ -5,6 +5,7 @@ import ChampionView from "./components/ChampionView";
 import HeroPage from "./components/HeroPage";
 import UserProfile from "./components/Profile";
 import { API_URI } from "./runtimeConfig";
+// import ExampleStoreUsage from "./components/ExampleStoreUsage";
 
 // Role icons imports
 import AllIcon from "./assets/120px-All_icon.png";
@@ -381,3 +382,4 @@ function ChampionTile({ champ, onShowDetails, onToggleFavorite, isFavorite }: { 
     </>
   );
 }
+
