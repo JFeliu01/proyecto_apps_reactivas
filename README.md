@@ -98,7 +98,7 @@ If the user has favorite champions, clicking on any of them opens their detailed
 
 1.  **Open two separate terminals and run both the frontend and the backend. Make sure both servers are running before executing the tests.**
 
-2. **Open a third terminal and navigate to the /test_e2e directory.**
+2. **Open a third terminal and navigate to the /e2etests directory.**
 
 3. **Run the Playwright installation command (only required the first time)**
 
