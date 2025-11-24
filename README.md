@@ -6,7 +6,25 @@ This project consists of a frontend developed with React and a backend using Exp
 
 - Node.js (v18 or higher)
 - npm
-- MongoDB (for backend)
+- Vite (7.1.2)
+- React (19.1.1)
+
+Frontend: 
+- Tailwind (3.4.17)
+- Zustand (5.0.8)
+
+Backend:
+- bcryptjs (2.4.3)
+- MongoDB (mongoose - 8.19.1)
+- cookie-parser (1.4.7)
+- cors (2.8.5)
+- dotenv (16.4.5)
+- express (5.1.0)
+- jsonwebtoken (9.0.2)
+
+Testing:
+- playwright (1.56.1)
+
 
 ## Installation and Execution
 
@@ -57,6 +75,25 @@ This project consists of a frontend developed with React and a backend using Exp
     ```
     The application will be available at `http://localhost:5173` (or on the port that Vite indicates in the terminal).
 
+### Route map
+
+- "/" (Landing Page):
+Entry point of the application. If the user is already authenticated, they are automatically redirected to "/grid".
+
+- "/grid" (Champion List):
+Displays the full catalog of champions.
+Clicking the profile button or View Profile redirects to "/profile".
+Clicking View Details on a champion card navigates to "/champion/:championId".
+
+- "/champion/:championId" (Champion Details):
+Shows the champion’s full information. Includes a Back to champion list button that redirects to "/grid".
+
+- "/profile" (User Profile):
+Shows detailed information of the authenticated user.
+Includes a button to return to the champion list.
+If the user has favorite champions, clicking on any of them opens their detailed page, just like in "/grid".
+
+
 ### Tests E2E
 
 1.  **Open two separate terminals and run both the frontend and the backend. Make sure both servers are running before executing the tests.**
@@ -82,11 +119,76 @@ This project consists of a frontend developed with React and a backend using Exp
 
     **There are three end-to-end tests included:**
 
-    User Registration — Creates a new account and verifies the user is logged in after registering.
+    1. User registration
+    Creates a new account and verifies the user is logged in after completing the registration.
+    Flow:
 
-    User Login — Logs in with an existing user and confirms authentication is successful.
+    - From the landing page, the user clicks the profile button.
+    - Selects Register.
+    - Fills out and submits the registration form.
 
-    Favorites CRUD — Adds three favorite champions and later removes them from the user profile, verifying both operations.
+    2. User Login 
+    Logs in with an existing user and confirms that authentication is successful.
+    Flow:
+
+    - From the landing page, the user clicks the profile button.
+    - Selects Login.
+    - Fills out and submits the login form.
+    
+    3. Favorites CRUD 
+    Adds three champions to favorites and later removes them, verifying both operations.
+    Flow:
+
+    - Login as in the previous test.
+    - Navigate to the champion list.
+    - Mark Ahri, Garen, and Lux as favorites via the favorite button inside the champion detail modal.
+    - Open the user profile and confirm the three champions appear in the favorites section.
+    - Return to the champion list, re-open each detail view, and remove them from favorites.
+    - Go back to the profile and confirm that the favorites list is now empty.
+
+## Styling Library and Design Decisions
+
+The project uses TailwindCSS
+
+# Landing Page
+Introduces the application and its main functionalities with a clean and straightforward design.
+
+# Login and Registration
+Follow a familiar, traditional layout to ensure clarity and ease of use.
+
+# Champion List
+As the core of the application, the design emphasizes clarity and visual organization:
+
+- Champions are displayed with an image and name for quick recognition.
+- Includes a role filter: All, Top, Jungle, Mid, ADC, Support.
+- Positioned centrally/right to improve visual hierarchy.
+- Includes a search bar and sorting options (alphabetical or by difficulty), aligned to the right for visual symmetry.
+
+# Champion Detail (summary view)
+
+A small modal-style window displaying:
+
+- Role/class
+- Short description of playstyle
+- Key stats
+- View Details button
+- Favorite button where users can mark up to three champions as favorites for quick access from the profile.
+
+# Champion Detail (full page)
+
+Includes everything from the summary view plus the full character lore.
+
+# View Profile
+
+Displays:
+- Username
+- Email
+- Player rank (visual decoration)
+- A list of favorited champions. Each favorite is clickable and leads directly to the champion’s full detail page.
+
+This design choice keeps important user information accessible while maintaining fluid navigation within the SPA.
+
+
 
 ## Production Deployment
 
