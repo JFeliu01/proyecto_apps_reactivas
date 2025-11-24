@@ -150,13 +150,13 @@ If the user has favorite champions, clicking on any of them opens their detailed
 
 The project uses TailwindCSS
 
-# Landing Page
+1. Landing Page:
 Introduces the application and its main functionalities with a clean and straightforward design.
 
-# Login and Registration
+2. Login and Registration:
 Follow a familiar, traditional layout to ensure clarity and ease of use.
 
-# Champion List
+3. Champion List
 As the core of the application, the design emphasizes clarity and visual organization:
 
 - Champions are displayed with an image and name for quick recognition.
@@ -164,7 +164,7 @@ As the core of the application, the design emphasizes clarity and visual organiz
 - Positioned centrally/right to improve visual hierarchy.
 - Includes a search bar and sorting options (alphabetical or by difficulty), aligned to the right for visual symmetry.
 
-# Champion Detail (summary view)
+4. Champion Detail (summary view)
 
 A small modal-style window displaying:
 
@@ -174,11 +174,11 @@ A small modal-style window displaying:
 - View Details button
 - Favorite button where users can mark up to three champions as favorites for quick access from the profile.
 
-# Champion Detail (full page)
+5. Champion Detail (full page)
 
 Includes everything from the summary view plus the full character lore.
 
-# View Profile
+6. View Profile
 
 Displays:
 - Username
